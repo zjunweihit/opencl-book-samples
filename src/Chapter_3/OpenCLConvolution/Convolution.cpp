@@ -256,20 +256,21 @@ int main(int argc, char** argv)
 	errNum |= clSetKernelArg(kernel, 4, sizeof(cl_uint), &maskWidth);
 	checkErr(errNum, "clSetKernelArg");
 
-	const size_t globalWorkSize[1] = { outputSignalWidth * outputSignalHeight };
-    const size_t localWorkSize[1]  = { 1 };
+	const size_t globalWorkSize[2] = { outputSignalWidth, outputSignalHeight };
+	const size_t localWorkSize[2]  = { 1, 1 };
+	cl_uint work_dim = 2;
 
-    // Queue the kernel up for execution across the array
-    errNum = clEnqueueNDRangeKernel(
-		queue, 
-		kernel, 
-		1, 
-		NULL,
-        globalWorkSize, 
-		localWorkSize,
-        0, 
-		NULL, 
-		NULL);
+	// Queue the kernel up for execution across the array
+	errNum = clEnqueueNDRangeKernel(
+			queue, 
+			kernel, 
+			work_dim, 
+			NULL,
+			globalWorkSize, 
+			localWorkSize,
+			0, 
+			NULL, 
+			NULL);
 	checkErr(errNum, "clEnqueueNDRangeKernel");
     
 	errNum = clEnqueueReadBuffer(
@@ -284,10 +285,10 @@ int main(int argc, char** argv)
 		NULL);
 	checkErr(errNum, "clEnqueueReadBuffer");
 
-    // Output the result buffer
-    for (int y = 0; y < outputSignalHeight; y++)
+	// Output the result buffer
+	for (int x = 0; x < outputSignalWidth; x++)
 	{
-		for (int x = 0; x < outputSignalWidth; x++)
+		for (int y = 0; y < outputSignalHeight; y++)
 		{
 			std::cout << outputSignal[x][y] << " ";
 		}
